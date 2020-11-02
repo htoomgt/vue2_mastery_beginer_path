@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Vue Instance</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <link href="./css/vue_mastery_main.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="nav-bar"></div>
+    <div id="app">
+        <div class="product">
+            <div class="product-image">
+                <img :src="product.image" :alt="product.description" width="100%">
+            </div>
+            <div class="product-info">
+                <h1> {{product.name}}</h1>
+								<p v-if="product.inventory  > 10"> In Stock </p>
+                <p v-else-if="product.inventory  <= 10 && product.inventory > 0"> Almost Sold Out </p>
+								<p v-else> Out of Stock </p>
+                <p v-if="product.onSale"> On Sale </p>
+                
+              
+                <p v-show="product.googleSearch"> <a :href="getGoogleSearchUrl(product.name)">Search at google</a>  </p>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
+<script>    
+    const app = new Vue({
+        el: '#app',
+        data: {
+            product: {
+              "name":"Socks", 
+              "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Expedita aliquam in dicta accusantium aperiam dolorem placeat eaque quisquam quis officia! Numquam, accusantium! Et facilis repellat nam earum. Quod, nemo quaerat!", 
+              "image":"https://www.vuemastery.com/images/challenges/vmSocks-green-onWhite.jpg",
+              "inventory" : 100,
+              "googleSearch" : true,
+              "onSale": true,
+            }   
+        },
+        computed: {
+            
+        },
+        methods:{
+            getGoogleSearchUrl(keyword){
+                return "https://www.google.com/search?q="+keyword;
+            }
+        },
+        created() {
+            
+        },
+    });
+</script>
+<!-- https://codepen.io/cfleschhut/pen/RdvVpX -->

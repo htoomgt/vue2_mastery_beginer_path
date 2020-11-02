@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Vue Instance</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1> {{product.name}}</h1>
+        <p> {{product.description}}</p>
+    </div>
+    
+</body>
+</html>
+<script>    
+    const app = new Vue({
+        el: '#app',
+        data: {
+            product: {"name":"Socks", "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Expedita aliquam in dicta accusantium aperiam dolorem placeat eaque quisquam quis officia! Numquam, accusantium! Et facilis repellat nam earum. Quod, nemo quaerat!"}   
+        },
+        computed: {
+            
+        },
+        created() {
+            
+        },
+    });
+</script>

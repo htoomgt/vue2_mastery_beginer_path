@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Rendering</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <link href="./css/vue_mastery_main.css" rel="stylesheet" />
+		
+</head>
+<body>
+    <div class="nav-bar"></div>
+    <div id="app">
+        <div class="product">
+            <div class="product-image">
+                <img :src="product.image" :alt="product.description" width="100%">
+            </div>
+            <div class="product-info">
+                <h1> {{product.name}}</h1>
+								<p v-if="product.inStock"> In Stock </p>
+								<p v-else> Out of Stock </p>
+                <ul> 
+                  <li v-for="detail in product.details"> {{ detail }}</li>
+                </ul>
+								<span><b> Color </b> </span>
+								<div v-for="variant in product.variants" :key="variant.variantId"> {{ variant.variantColor }}</div>
+
+								<br/>
+								<span><b> Size </b></span>
+								<div v-for="size in product.sizes" :key="size.sizeId"> {{ size.displaySize }}</div>
+
+                <p v-show="product.googleSearch"> <a :href="getGoogleSearchUrl(product.name)">Search at google</a>  </p>
+                
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
+<script>    
+    const app = new Vue({
+        el: '#app',
+        data: {
+            product: {
+              "name":"Socks", 
+              "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Expedita aliquam in dicta accusantium aperiam dolorem placeat eaque quisquam quis officia! Numquam, accusantium! Et facilis repellat nam earum. Quod, nemo quaerat!", 
+              "image":"https://www.vuemastery.com/images/challenges/vmSocks-green-onWhite.jpg",
+              "inStock": true,
+							"googleSearch" : false,
+              "details" : ["80% cotton", "20% ployester", "Gender-neutral"],
+							"variants": [
+								{ "variantId": 2234, "variantColor": "green"},
+								{ "variantId": 2235, "variantColor": "blue"}
+							],
+							"sizes" : [
+								{"sizeId": 8264, "displaySize": "39"},
+								{"sizeId": 8265, "displaySize": "40"},
+								{"sizeId": 8266, "displaySize": "41"},
+								{"sizeId": 8267, "displaySize": "42"},
+								{"sizeId": 8268, "displaySize": "44"},
+							]
+
+            }   
+        },
+        computed: {
+            
+        },
+        methods:{
+            getGoogleSearchUrl(keyword){
+                return "https://www.google.com/search?q="+keyword;
+            }
+        },
+        created() {
+            
+        },
+    });
+</script>
+<!-- https://codepen.io/cfleschhut/pen/RdvVpX -->

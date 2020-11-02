@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forms and V Model</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <link href="./css/vue_mastery_main.css" rel="stylesheet" />
+		
+</head>
+<body>
+    <div class="nav-bar"></div>
+    <div id="app">
+        <div class="cart"> 
+          <p> Cart({{cart.length}}) </p>
+        </div>
+        <product :premium="premium" :cart="cart" @add-to-cart="addToCart" @remove-from-cart="removeFromCart"></product><br/>
+        
+        <!--<product> </product><br/>
+        <product> </product><br/>-->
+        
+        
+    </div>
+    
+</body>
+</html>
+<script>
+    Vue.component('product-review', {
+      template: `
+        <form action="" method="POST" class="review-form" @submit.prevent="onSubmit"> 
+          <p v-if="errors.length"> 
+              <b> Please correct the follwing error(s):</b>
+              <ul>
+                <li v-for="error in errors">{{ error }}</li>
+              </ul>
+          <p>
+          <p>
+            <label for="name"> Name :</label>
+            <input id="name" v-model.trim="name" />
+          </p>
+          <p>
+            <label for="name"> Review :</label>
+            <textarea id="review" v-model.trim="review" ></textarea>
+          </p>
+          <label for="rating"> Rating :</label>
+          <select id="rating" v-model.number="rating">
+            <option> 5 </option>
+            <option> 4 </option>
+            <option> 3 </option>
+            <option> 2 </option>
+            <option> 1 </option>
+          </select>
+          <p> 
+            <label for="recommend"> Recommend :</label> <br/>
+            <div class='radio_text'> Yes :</div><input type="radio" name="recommend" id="recommend" v-model="recommend" value="true" />  <br/>
+            <div class='radio_text'>No :</div><input type="radio" name="recommend" id="recommend" v-model="recommend" value="false" checked="true"/> 
+          </p>
+          <p> 
+            <input type="submit" value="submit"/>
+          </p>
+        </form>
+        
+      `,
+      data(){
+        return{
+          name: null,
+          review: null,
+          rating: null,
+          recommend: null,
+          errors: [],
+        }
+      },
+      methods:{
+        onSubmit(){
+          if(this.name && this.review && this.rating){          
+            let productReveiw = {
+              name: this.name,
+              review: this.review,
+              rating: this.rating,
+              recommend: this.recommend
+            }
+            this.$emit('review-submitted', productReveiw);
+
+            this.name = null
+            this.review = null 
+            this.rating = null
+            this.recommend = null
+          }
+          else{
+            if(!this.name) this.errors.push("Name required.");
+            if(!this.rating) this.errors.push("Rating required.");
+            if(!this.review) this.errors.push("Review required.");
+          }
+        }
+      }
+
+    });
+
+		Vue.component('product-detail', {
+			props:{
+				details: {
+					type: Array,
+					required: true
+				}
+			},
+			template: `<ul> 
+                  <li v-for="detail in details"> {{ detail }}</li>
+                </ul>`,
+			
+
+		});
+
+		Vue.component('product', {
+			props: {
+				premium: {
+					type: Boolean,
+					required: true
+        },
+        cart:{
+          type: Array,
+          required: true
+        }
+			},
+			template: `
+				<div class="product">
+            <div class="product-image">
+                <img :src="image" :alt="product.description" width="100%">
+            </div>
+            <div class="product-info">
+                <h1> {{ productTitle }}</h1>
+								<p v-if="inStock"> In Stock </p>
+								<p v-else :class='{outOfStock: !inStock}'> Out of Stock </p>
+                <product-detail :details="product.details"></product-detail>
+
+								<span><b> Color </b> </span><br/>
+                <div 
+                  v-for="(variant, index) in product.variants" 
+                  :key="variant.variantId"
+                  class="color-box"
+                  :style="{ backgroundColor: variant.variantColor}"
+                  @mouseover="updateProduct(index)"
+                  > 
+									
+								</div>
+
+								<br/><br/>
+								<span><b> Size </b></span>
+								<div v-for="size in product.sizes" :key="size.sizeId"> {{ size.displaySize }}</div>
+								<p> User is premium : {{ premium }} </p>
+								<p> Shipping: {{ shipping }}</p>
+                <p v-show="product.googleSearch"> <a :href="getGoogleSearchUrl(product.name)">Search at google</a>  </p>
+								
+                
+                <br/>
+                <button v-on:click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock}"> Add to cart </button>
+                <br/>
+                <button v-on:click="removeFromCart" :disabled="disabledRemoveButton" :class="{ disabledButton: disabledRemoveButton}"> Remove from cart </button>
+                
+                <div>
+                  <h2> Reviews </h2>
+                  <p v-if="!reviews.length"> There are no reviews yet. </p>
+                  <ul> 
+                      <li v-for="review in reviews">
+                        <p> Name : {{ review.name }} </p>
+                        <p> Rating : {{ review.rating }} </p>
+                        <p> Review : {{ review.review }} </p>
+                        <p> Recommend : {{ review.recommend }} </p>
+                      
+                      </li>
+                  </ul>
+                </div>
+
+                <product-review @review-submitted="addReview"> </product-review>
+								
+								
+            </div>
+        </div>
+			`,
+			data(){
+				return{
+					product: {
+              "brand" : "Vue Mastery",
+              "name":"Socks", 
+              "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Expedita aliquam in dicta accusantium aperiam dolorem placeat eaque quisquam quis officia! Numquam, accusantium! Et facilis repellat nam earum. Quod, nemo quaerat!", 
+              "selectedVariant":0,
+              "onSale" : true,
+              /* "inStock": true, */
+							"googleSearch" : false,
+              "details" : ["80% cotton", "20% ployester", "Gender-neutral"],
+							"variants": [
+								{ "variantId": 2234, "variantColor": "green", "quantity": 50,"image": "https://www.vuemastery.com/images/challenges/vmSocks-green-onWhite.jpg"},
+								{ "variantId": 2235, "variantColor": "blue", "quantity": 0, "image": "https://www.vuemastery.com/images/challenges/vmSocks-blue-onWhite.jpg"}
+							],
+							"sizes" : [
+								{"sizeId": 8264, "displaySize": "39"},
+								{"sizeId": 8265, "displaySize": "40"},
+								{"sizeId": 8266, "displaySize": "41"},
+								{"sizeId": 8267, "displaySize": "42"},
+								{"sizeId": 8268, "displaySize": "44"},
+							]
+
+            },
+            reviews: []
+						
+				}
+			},
+			methods: {
+				getGoogleSearchUrl(keyword){
+                return "https://www.google.com/search?q="+keyword;
+            },
+						addToCart(){
+							this.$emit('add-to-cart', this.product.variants[this.product.selectedVariant].variantId);
+						},
+						removeFromCart(){
+							this.$emit('remove-from-cart', this.product.variants[this.product.selectedVariant].variantId);
+						},
+						updateProduct(index){							
+              this.product.selectedVariant = index;              
+            },
+            getMethodTitle(){
+              return this.product.brand + " " + this.product.name
+            },
+            addReview(productReveiw){
+              this.reviews.push(productReveiw)
+            }
+			},
+			computed:{
+				disabledRemoveButton (){
+              var status = false;              
+              if(this.cart.length <= 0){ 
+                status = true;
+              }
+              else{
+                status = false;
+              }
+              return status;
+            },
+            productTitle(){
+              if(this.product.onSale){
+                return this.product.brand + " " + this.product.name;
+              }
+              else{
+                return "Not for sale";
+              }
+              
+            },
+            image(){
+              return this.product.variants[this.product.selectedVariant].image;
+            },
+            inStock(){              
+              if(this.product.variants[this.product.selectedVariant].quantity >= 1){
+                return true;
+              }
+              else{
+                return false;
+              }
+            },
+						shipping(){
+							if(this.premium){
+								return "Free";
+							}else {
+								return 2.99;
+							}
+						}
+      },
+      created() {
+        // console.log(this.cart);      
+      },
+      updated(){
+        console.log(this.cart);      
+      }
+      
+		});
+    const app = new Vue({
+        el: '#app',
+        data: {
+            premium: false,
+            cart: []
+        },
+        computed: {
+            
+
+        },
+        methods:{
+          addToCart(id){
+            this.cart.push(id)
+          },
+          removeFromCart(id){
+
+            this.cart.pop();
+          }
+        },
+        created() {
+            
+        },
+    });
+</script>
+<!-- https://codepen.io/cfleschhut/pen/RdvVpX -->
